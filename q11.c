@@ -14,9 +14,11 @@ int main() {
     printf("Enter number of frames: ");
     scanf("%d", &f);
 
-    // initialize frames
-    for(i = 0; i < f; i++)
+    // initialize frames and time
+    for(i = 0; i < f; i++) {
         frame[i] = -1;
+        time[i] = 0;
+    }
 
     for(i = 0; i < n; i++) {
         flag = 0;
@@ -31,19 +33,37 @@ int main() {
             }
         }
 
-        // if page fault
+        // if page not found
         if(flag == 0) {
-            pos = 0;
 
-            // find least recently used
-            for(j = 1; j < f; j++) {
-                if(time[j] < time[pos])
+            // check for empty frame first
+            pos = -1;
+            for(j = 0; j < f; j++) {
+                if(frame[j] == -1) {
                     pos = j;
+                    break;
+                }
             }
 
-            frame[pos] = pages[i];
-            t++;
-            time[pos] = t;
+            // if empty frame found
+            if(pos != -1) {
+                frame[pos] = pages[i];
+                t++;
+                time[pos] = t;
+            }
+            else {
+                // apply LRU
+                pos = 0;
+                for(j = 1; j < f; j++) {
+                    if(time[j] < time[pos])
+                        pos = j;
+                }
+
+                frame[pos] = pages[i];
+                t++;
+                time[pos] = t;
+            }
+
             faults++;
         }
 
